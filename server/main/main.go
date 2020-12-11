@@ -11,18 +11,18 @@ import (
 	"./appliances"
 )
 
-/** JSONデコード用に構造体定義 */
-type SignalList struct {
-	ID string `json:"sigID"`
-}
+var appliancesHandler = new(appliances.Nature)
 
 func main() {
+	appliancesHandler.SetToken()
+
 	addr := flag.String("a", "127.0.0.1", "IP Address")
 
 	engine := gin.Default()
 	engine.GET("/action", func(c *gin.Context) {
 		// 制御を実行
 		action()
+		// 応答を返す
 		c.JSON(http.StatusOK, gin.H{
 			"message": "success",
 		})
@@ -30,6 +30,11 @@ func main() {
 	})
 
 	engine.Run(*addr + ":55555")
+}
+
+/** JSONデコード用に構造体定義 */
+type SignalList struct {
+	ID string `json:"sigID"`
 }
 
 func action() {
@@ -45,8 +50,8 @@ func action() {
 		log.Fatal(err)
 	}
 	// デコードしたデータを基にシグナルを順次送信
-	for _, p := range persons {
-		nature.SendSignal(p.ID)
+	for _, p := range siglist {
+		appliancesHandler.SendSignal(p.ID)
 		log.Printf("Sent signal : %s\n", p.ID)
 	}
 
