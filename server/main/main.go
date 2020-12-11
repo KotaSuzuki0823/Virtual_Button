@@ -1,11 +1,20 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
 	"log"
 	"net/http"
+
+	"./appliances"
 )
+
+/** JSONデコード用に構造体定義 */
+type SignalList struct {
+	ID string `json:"sigID"`
+}
 
 func main() {
 	addr := flag.String("a", "127.0.0.1", "IP Address")
@@ -24,5 +33,21 @@ func main() {
 }
 
 func action() {
+	// JSONファイル読み込み
+	bytes, err := ioutil.ReadFile("token.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// JSONデコード
+	var siglist []SignalList
+	if err := json.Unmarshal(bytes, &siglist); err != nil {
+		log.Fatal(err)
+	}
+	// デコードしたデータを基にシグナルを順次送信
+	for _, p := range persons {
+		nature.SendSignal(p.ID)
+		log.Printf("Sent signal : %s\n", p.ID)
+	}
 
 }
