@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strings"
 )
 
@@ -27,29 +28,25 @@ type Nature struct {
 	airconAirDirection string
 }
 
+/** JSONデコード用に構造体定義 */
 type temp struct {
 	// エアコン用変数
 	// ID
-	id string
+	id string `json:"sigID"`
 	// 温度
-	temperature string
+	temperature string `json:"temperature"`
 	// 運転モード
-	mode string
+	mode string `json:"mode"`
 	// 風量
-	airVolume string
+	airVolume string `json:"volume"`
 	// 風向
-	airDirection string
+	airDirection string `json:"direction"`
 }
 
 // SetToken tokenファイルから読み込み
 func (n Nature) SetToken() {
 	// tokenファイル読み込み
-	bytes, err := ioutil.ReadFile("token")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	n.token = string(bytes)
+	n.token = os.Getenv("NATURE_TOKEN")
 }
 
 // SendSignal idで指定した赤外線シグナルの送信
@@ -85,7 +82,9 @@ func (n Nature) loadAirconSettings() bool {
 	// JSONデコード
 	var list []temp
 	if err := json.Unmarshal(bytes, &list); err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		log.Print("AirconSettings.jsonの解析に失敗したため，エアコン操作は行われません．")
+		return false
 	}
 
 	n.airconID = list[0].id

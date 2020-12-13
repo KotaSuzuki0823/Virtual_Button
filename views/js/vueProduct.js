@@ -7,7 +7,7 @@ new Vue({
     methods: {
         // サーバを叩く(指定したルーティンを実行させる)
         runAction() {
-            axios.get('/action')
+            axios.get('http://192.168.3.16:55555/action')
             .then(response => {
                 if (response.status != 200) {
                     throw new Error('レスポンスエラー')

@@ -39,7 +39,7 @@ type SignalList struct {
 
 func action() {
 	// JSONファイル読み込み
-	bytes, err := ioutil.ReadFile("token.json")
+	bytes, err := ioutil.ReadFile("SignalList.json")
 	if err != nil {
 		log.Fatal(err)
 	}
