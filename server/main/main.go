@@ -55,4 +55,7 @@ func action() {
 		log.Printf("Sent signal : %s\n", p.ID)
 	}
 
+	// エアコンシグナル送信
+	appliancesHandler.AirconSignalSend()
+
 }
