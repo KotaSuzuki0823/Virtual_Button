@@ -3,10 +3,11 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 
 	"./appliances"
 )
@@ -39,7 +40,7 @@ type SignalList struct {
 
 func action() {
 	// JSONファイル読み込み
-	bytes, err := ioutil.ReadFile("SignalList.json")
+	bytes, err := ioutil.ReadFile("./settings/SignalList.json")
 	if err != nil {
 		log.Fatal(err)
 	}

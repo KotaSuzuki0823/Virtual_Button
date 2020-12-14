@@ -72,7 +72,7 @@ func (n Nature) SendSignal(id string) {
 // loadAirconSettings AirconSettings.jsonから送信したいエアコンシグナルを読み込み
 func (n Nature) loadAirconSettings() bool {
 	// jsonファイル読み込み
-	bytes, err := ioutil.ReadFile("AirconSettings.json")
+	bytes, err := ioutil.ReadFile("./settings/AirconSettings.json")
 	if err != nil {
 		log.Print(err)
 		log.Print("AirconSettings.jsonが見つからないため，エアコン操作は行われません．")
