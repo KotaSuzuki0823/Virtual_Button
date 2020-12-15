@@ -46,12 +46,13 @@ type temp struct {
 }
 
 // SetToken tokenファイルから読み込み
-func (n Nature) SetToken() {
+//参照渡し
+func (n *Nature) SetToken() {
 	//n.token = os.Getenv("NATURE_TOKEN")
 	var err error
 
 	// tokenファイル読み込み
-	n.token, err = readOneLine("token")
+	n.token, err = readOneLine("./settings/token")
 	if err != nil {
 		log.Fatal(err)
 	}
