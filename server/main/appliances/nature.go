@@ -1,7 +1,9 @@
 package appliances
 
 import (
+	"bufio"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -45,24 +47,33 @@ type temp struct {
 
 // SetToken tokenファイルから読み込み
 func (n Nature) SetToken() {
+	//n.token = os.Getenv("NATURE_TOKEN")
+	var err error
+
 	// tokenファイル読み込み
-	n.token = os.Getenv("NATURE_TOKEN")
+	n.token, err = readOneLine("token")
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Print("Set token:" + n.token[:6] + "...")
 }
 
 // SendSignal idで指定した赤外線シグナルの送信
 func (n Nature) SendSignal(id string) {
+
 	url := "https://api.nature.global/1/signals/" + id + "/send"
+
 	req, _ := http.NewRequest("POST", url, nil)
 
 	req.Header.Set("accept", " application/json")
 	req.Header.Set("Authorization", " Bearer "+n.token)
 
 	client := new(http.Client)
-	log.Printf("Send request")
+	log.Print("Send request")
 	resp, err := client.Do(req)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 
 	dumpResp, _ := httputil.DumpResponse(resp, true)
@@ -130,4 +141,23 @@ func (n Nature) AirconSignalSend() {
 		// AirconSettings.jsonがない場合，何もしない
 		return
 	}
+}
+
+func readOneLine(filename string) (string, error) {
+	fp, err := os.Open(filename)
+	if err != nil {
+		return "", err
+	}
+	defer fp.Close()
+
+	reader := bufio.NewReader(fp)
+	line, _, err := reader.ReadLine()
+	if err == io.EOF {
+		return "", err
+	}
+	if err != nil {
+		return "", err
+	}
+
+	return string(line), nil
 }

@@ -18,16 +18,23 @@ func main() {
 	appliancesHandler.SetToken()
 
 	addr := flag.String("a", "127.0.0.1", "IP Address")
+	flag.Parse()
 
 	engine := gin.Default()
 	engine.GET("/action", func(c *gin.Context) {
 		// 制御を実行
-		action()
-		// 応答を返す
-		c.JSON(http.StatusOK, gin.H{
-			"message": "success",
-		})
-
+		if err := action(); err != nil {
+			log.Print(err)
+			// 応答を返す
+			c.JSON(http.StatusOK, gin.H{
+				"message": "fault",
+			})
+		} else {
+			// 応答を返す
+			c.JSON(http.StatusOK, gin.H{
+				"message": "success",
+			})
+		}
 	})
 
 	engine.Run(*addr + ":55555")
@@ -38,17 +45,17 @@ type SignalList struct {
 	ID string `json:"sigID"`
 }
 
-func action() {
+func action() error {
 	// JSONファイル読み込み
 	bytes, err := ioutil.ReadFile("./settings/SignalList.json")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// JSONデコード
 	var siglist []SignalList
 	if err := json.Unmarshal(bytes, &siglist); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	// デコードしたデータを基にシグナルを順次送信
 	for _, p := range siglist {
@@ -59,4 +66,5 @@ func action() {
 	// エアコンシグナル送信
 	appliancesHandler.AirconSignalSend()
 
+	return nil
 }
